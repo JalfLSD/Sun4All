@@ -1,0 +1,92 @@
+function loadImage() {
+    var url;
+    if (inverted)
+        url = "http://societic.ibercivis.es/sun4all/static/sunimages/inv/" + currentImage;
+    else url = "http://societic.ibercivis.es/sun4all/static/sunimages/" + currentImage;
+    $("#preview").attr("src", url);
+
+    // Set the image description
+    var parts = currentImage.split("_");
+    var date = new Date('19' + parts[3], parts[2]-1, parts[1]);
+    $('#lblImage').text('This is an image taken in ' + monthNames[date.getMonth()] + ', ' + parts[1] + ' - 19' + parts[3]);
+
+    // Hide Picture and Show the loading image
+    var image = document.getElementById('sunPicture');
+    $(image).hide();
+    $('#loadingPicture').show();
+    image.onload = function () {
+        jQuery(function ($) {
+            // Show image
+            $(image).show();
+            $('#loadingPicture').hide();
+            // Setup the area selector
+            $('#sunPicture').imgAreaSelect({
+                handles: false,
+                movable: true,
+                resizable: false,
+                keys: false,
+                aspectRatio: '1:1',
+                fadeSpeed: 200,
+                onSelectStart: selectStarted,
+                onSelectEnd: selectEnded,
+                onSelectChange: previewSelection
+            });
+        });
+    };
+
+    $("#sunPicture").attr("src", url);
+};
+
+/* Selection/preview functions */
+function previewSelection(img, selection) {
+    if (!selection.width || !selection.height)
+        return;
+
+    var scaleX = 150 / selection.width;
+    var scaleY = 150 / selection.height;
+
+    $('#preview').css({
+        width: Math.round(scaleX * img.width) + 'px',
+        height: Math.round(scaleY * img.height) + 'px',
+        marginLeft: '-' + Math.round(scaleX * selection.x1) + 'px',
+        marginTop: '-' + Math.round(scaleY * selection.y1) + 'px'
+    });
+};
+
+function selectStarted(img, selection) {
+    $('#preview').show();
+};
+
+function selectEnded(img, selection) {
+    if (selection.width == 0) {
+        // disable controls
+        $('#preview').hide();
+        //$('#pictureCanvas').hide();
+
+        var ias = $('#sunPicture').imgAreaSelect({ instance: true });
+        ias.setOptions({ show: true });
+        ias.update();
+
+        $("#btnAddSpot").attr("disabled", "disabled");
+        $("#btnAddCluster").attr("disabled", "disabled");
+
+        currentSelection = null;
+    }
+    else {
+        $("#btnAddSpot").removeAttr("disabled");
+        $("#btnAddCluster").removeAttr("disabled");
+
+        currentSelection = selection;
+    }
+};
+
+function drawSelection(selection, color) {
+    var canvas = document.getElementById("pictureCanvas");
+    var ctx = canvas.getContext('2d');
+
+    ctx.strokeStyle = color;
+    var r = selection.width / 2;
+    ctx.beginPath();
+    ctx.arc(selection.x1 + r + 3, selection.y1 + r + 3, r, 0, 2 * Math.PI);
+    ctx.stroke();
+}

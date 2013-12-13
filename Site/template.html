@@ -1,13 +1,12 @@
-﻿<link href="static/imgareaselect-default.css" rel="stylesheet" type="text/css" />
+﻿<!-- <link href="static/imgareaselect-default.css" rel="stylesheet" type="text/css" />
 <link href="static/bootstrap.css" rel="stylesheet" type="text/css">
 <link href="static/styles.css" rel="stylesheet" type="text/css">
 <script src="static/js/jquery.js" type="text/javascript"></script>
 <script src="static/js/bootstrap.js" type="text/javascript"></script>
 <script src="static/js/kinetic-v4.7.2.min.js" type="text/javascript"></script>
-<script src="static/js/game.js" type="text/javascript"></script>
+<script src="static/js/game.js" type="text/javascript"></script> 
+-->
 
-<!-- DEPLOY
-<link href="http://societic.ibercivis.es/sun4all/static/imgareaselect-default.css" rel="stylesheet" type="text/css"  />
 <link href="http://societic.ibercivis.es/sun4all/static/styles.css" rel="stylesheet" type="text/css">
 <script src="http://societic.ibercivis.es/sun4all/static/js/bootstrap.js" type="text/javascript"></script>
 <script src="http://societic.ibercivis.es/sun4all/static/js/kinetic-v4.7.2.min.js" type="text/javascript" ></script>
@@ -27,7 +26,7 @@
     // run task
     pybossa.setEndpoint("/pybossa");
     pybossa.run('Sun4All');
-</script>-->
+</script>
 
 
 <div id="mainDivGame" class="blockDiv">
@@ -63,19 +62,20 @@
         <div id="pictureCanvas" style="width:600px;height:600px;position:absolute; left: 0; display: none;border:solid;background-color: white"></div>
     </div>
 
+
     <!--Observation Div-->
     <div style="position: relative; top: 0px; left: 610px; width: 180px; height: 240px; border: solid; padding: 10px; ">
         <fieldset>
             <legend>Observation</legend>
-            <button id="btnAddSpot" class="btn btn-warning" disabled type="button" style="width:100%;" onclick="javascript:addSpot();">Add Sun Spot</button>
-            <button id="btnAddCluster" class="btn btn-primary" disabled type="button" style="width:100%;margin-top:10px" onclick="javascript:addCluster();">Add Cluster</button>
+            <button id="btnAddSpot" class="btn btn-warning" disabled type="button" style="width:100%;" onclick="javascript:addSpot();">Add Sunspot</button>
+            <button id="btnAddCluster" class="btn btn-primary" disabled type="button" style="width:100%;margin-top:10px" onclick="javascript:addCluster();">Add Sunspot Group</button>
             <label style="margin-top: 15px;">Add Info:</label>
-            <textarea id="txtObservation" style="padding-right: 10px;width:100%;resize:none;" rows="3"></textarea>
+            <textarea id="txtObservation" style="width:90%;resize:none;" rows="3"></textarea>
         </fieldset>
     </div>
 
     <!--Your Data-->
-    <div style="position:relative;border:solid;padding:10px; width:180px;top:90px;left:610px;">
+    <div style="position:relative;border:solid;padding:10px; width:180px;top:78px;left:610px;">
         <fieldset>
             <legend>Your Data</legend>
             <h4><label id="lblspotCount">Spots count: 0</label></h4>
@@ -87,7 +87,7 @@
     </div>
 
     <!--Toolbar-->
-    <div class="btn-toolbar" style="position: relative;top:45px;left:106px;width:500px;">
+    <div class="btn-toolbar" style="position: relative;top:30px;left:82px;width:520px;">
         <!--Zoom buttons-->
         <div class="btn-group">
             <button type="button" onclick="javascript: doZoom(-0.030);" class="btn btn-primary"><i class="icon-zoom-out icon-white"></i>&nbsp;</button>
@@ -141,7 +141,7 @@
 
 <script type="text/javascript">
     // Remove on deploy
-    currentImage = 'K1-v_08_09_80_11h_04_E_C.jpg';
+    //currentImage = 'K1-v_08_09_80_11h_04_E_C.jpg';
     // Initialize interface
     setupKinect();
 </script>

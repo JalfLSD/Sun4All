@@ -32,11 +32,11 @@
 <div id="mainDivGame" class="blockDiv">
     <!--Header Div-->
     <div id="headerDiv" class="header">
-        <a target="_blank" href="#infoDialog" data-toggle="modal" title="Experiment info">
+        <span title="Experiment info" onclick="loadTutorial();" style="cursor: pointer">
             <img style="left: 814px" class="headerButton" src="http://societic.ibercivis.es/sun4all/static/images/info.png"
                  onmouseover="javascript:ChangeImage(this,'http://societic.ibercivis.es/sun4all/static/images/infoOver.png');"
                  onmouseout="javascript:ChangeImage(this,'http://societic.ibercivis.es/sun4all/static/images/info.png');" />
-        </a>
+        </span>
         <a href="javascript:openShareWindow('http://twitter.com/share?text=Contribute%20with%20our%20project!&url=http://pybossa.socientize.eu/pybossa/app/sun4all');" data-toggle="tooltip" title="Click to Share on Twitter">
             <img class="headerButton" style="left: 826px" src="http://societic.ibercivis.es/sun4all/static/images/twitter.png"
                  onmouseover="javascript:ChangeImage(this,'http://societic.ibercivis.es/sun4all/static/images/twitterOver.png');"
@@ -112,17 +112,7 @@
 
 
 <!-- Info Dialog -->
-<div id="infoDialog" class="modal hide fade" style="width:450px" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>Information</h3>
-    </div>
-    <div class="modal-body">
-        <p>TBA</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-info" data-dismiss="modal">Ok</button>
-    </div>
+<div id="infoDialog" style="display: none;">
 </div>
 
 <!-- Completed Dialog -->
@@ -144,4 +134,16 @@
     //currentImage = 'K1-v_08_09_80_11h_04_E_C.jpg';
     // Initialize interface
     setupKinect();
+    
+    function loadTutorial() {
+    	$("#infoDialog").empty();
+    	$("#infoDialog").load("http://localhost/sun4all/templates/tutorial.html", function() {
+    		$("#infoDialog").show();
+    		$("#startContrib").html("<i class='icon-thumbs-up'></i> Continue contributing!");
+    		$("#startContrib").click(function (e) {
+				e.preventDefault();
+				$("#modal").modal('hide');
+    		});
+    	})
+    }
 </script>

@@ -135,9 +135,12 @@
     // Initialize interface
     setupKinect();
     
+    //var templateServer = "localhost";
+    var templateServer = "societic.ibercivis.es";
+    
     function loadTutorial() {
     	$("#infoDialog").empty();
-    	$("#infoDialog").load("http://localhost/sun4all/templates/tutorial.html", function() {
+    	$("#infoDialog").load("http://" + templateServer + "/sun4all/templates/tutorial.html", function() {
     		$("#infoDialog").show();
     		$("#startContrib").html("<i class='icon-thumbs-up'></i> Continue contributing!");
     		$("#startContrib").click(function (e) {

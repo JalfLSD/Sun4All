@@ -330,7 +330,7 @@ function removeSelectedCircle() {
 	} else {
 		clusters.splice(clusters.indexOf(entry), 1);
 		clusterCount--;
-		$('#lblclusterCount').text('Clusters count:' + clusterCount);
+		$('#lblclusterCount').text('Clusters count: ' + clusterCount);
 	}
 	
 	circleSelected.remove();
@@ -350,7 +350,7 @@ function addSpot() {
 function addCluster() {
 	clusters[clusterCount] = createAnEntry("cluster", selection.attrs.x, selection.attrs.y, selection.attrs.width);
 	clusterCount++;
-	$('#lblclusterCount').text('Clusters count:' + clusterCount);
+	$('#lblclusterCount').text('Clusters count: ' + clusterCount);
 	circle = drawSelection("blue");
 	setSelectedCircle(circle);
 	$('#pictureCanvas').show();
@@ -365,7 +365,7 @@ function startOver() {
 	clusterCount = 0;
 	spots = new Array();
 	clusters = new Array();
-	$('#lblclusterCount').text('Clusters count:' + clusterCount);
+	$('#lblclusterCount').text('Clusters count: ' + clusterCount);
 	$('#lblspotCount').text('Spots count: ' + spotCount);
 
 	//reset canvas

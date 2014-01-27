@@ -140,11 +140,11 @@ function setupKinect() {
 		var x = stage.attrs.x;
 		var y = stage.attrs.y;
 		if (e.keyCode == 37) //Left Arrow Key
-			x -= 10;
+			x += 10;
 		if (e.keyCode == 38) //Up Arrow Key
 			y += 10;
 		if (e.keyCode == 39) //Right Arrow Key
-			x += 10;
+			x -= 10;
 		if (e.keyCode == 40) //Top Arrow Key
 			y -= 10;
 

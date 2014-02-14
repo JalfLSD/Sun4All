@@ -20,9 +20,6 @@ var normalImage, invImage;
 var selection = null;
 var dragging = false;
 
-var monthNames = ["January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November", "December"];
-
 /* MISC Functions */
 function ChangeImage(img, url) {
 	img.src = url;
@@ -269,7 +266,7 @@ function loadImages() {
 	// Set the image description
 	var parts = currentImage.split("_");
 	var date = new Date('19' + parts[3], parts[2] - 1, parts[1]);
-	$('#lblImage').text('This is an image taken in ' + monthNames[date.getMonth()] + ', ' + parts[1] + ' - 19' + parts[3]);
+	$('#lblImage').text(getDataTakenInfo(date));
 
 	normalImage = new Image();
 	normalImage.onload = function () {
@@ -280,13 +277,13 @@ function loadImages() {
 		sun.setImage(normalImage);
 		stage.draw();
 	};
-	normalImage.src = "http://societic.ibercivis.es/sun4all/static/sunimages/" + currentImage;
+	normalImage.src = "http://societic.ibercivis.es/sun4all/sunimages/" + currentImage;
 
 	invImage = new Image();
 	invImage.onload = function() {
 		$("#btnInvert").removeAttr("disabled");
 	};
-	invImage.src = "http://societic.ibercivis.es/sun4all/static/sunimages/inv/" + currentImage;
+	invImage.src = "http://societic.ibercivis.es/sun4all/sunimages/inv/" + currentImage;
 }
 
 function drawSelection(color) {
@@ -308,12 +305,12 @@ function drawSelection(color) {
 
 function setSelectedCircle(circle) {
 	circleSelected = circle;
-	$("#removerSpotOrCluster").removeAttr("disabled");
+	$("#removeSpotOrCluster").removeAttr("disabled");
 }
 
 function clearSelectedCircle() {
 	circleSelected = null;
-	$("#removerSpotOrCluster").prop("disabled", 'true');
+	$("#removeSpotOrCluster").prop("disabled", 'true');
 }
 
 function removeSelectedCircle() {
@@ -326,11 +323,11 @@ function removeSelectedCircle() {
 	if (entryType == 'spot') {
 		spots.splice(spots.indexOf(entry), 1);
 		spotCount--;
-		$('#lblspotCount').text('Spots count: ' + spotCount);
+		$('#lblspotCount').text(spotCount);
 	} else {
 		clusters.splice(clusters.indexOf(entry), 1);
 		clusterCount--;
-		$('#lblclusterCount').text('Clusters count: ' + clusterCount);
+		$('#lblclusterCount').text(clusterCount);
 	}
 	
 	circleSelected.remove();
@@ -341,7 +338,7 @@ function removeSelectedCircle() {
 function addSpot() {
 	spots[spotCount] = createAnEntry("spot", selection.attrs.x, selection.attrs.y, selection.attrs.width);
 	spotCount++;
-	$('#lblspotCount').text('Spots count: ' + spotCount);
+	$('#lblspotCount').text(spotCount);
 	circle = drawSelection("yellow");
 	setSelectedCircle(circle);
 	$('#pictureCanvas').show();
@@ -350,7 +347,7 @@ function addSpot() {
 function addCluster() {
 	clusters[clusterCount] = createAnEntry("cluster", selection.attrs.x, selection.attrs.y, selection.attrs.width);
 	clusterCount++;
-	$('#lblclusterCount').text('Clusters count: ' + clusterCount);
+	$('#lblclusterCount').text(clusterCount);
 	circle = drawSelection("blue");
 	setSelectedCircle(circle);
 	$('#pictureCanvas').show();
@@ -365,8 +362,8 @@ function startOver() {
 	clusterCount = 0;
 	spots = new Array();
 	clusters = new Array();
-	$('#lblclusterCount').text('Clusters count: ' + clusterCount);
-	$('#lblspotCount').text('Spots count: ' + spotCount);
+	$('#lblclusterCount').text(clusterCount);
+	$('#lblspotCount').text(spotCount);
 
 	//reset canvas
 	var selections = layer.get('.spot');

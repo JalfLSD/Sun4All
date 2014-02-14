@@ -8,6 +8,7 @@
 	padding-right: 10px;
 	margin-right: 10px;
 	text-align: center;
+	min-height: 375px;
 }
 
 #sunspot-group-panel {
@@ -18,6 +19,7 @@
 	padding-bottom: 10px;
 	padding-right: 10px;
 	text-align: center;
+	min-height: 375px;
 }
 
 .sunspot-images-container {
@@ -58,310 +60,295 @@
 }
 </style>
 
-<div class="row">
+<script src="/sun4all/js/jquery.i18n.min.js"
+	type="text/javascript"></script>
+<script src="/sun4all/js/sun4all.i18n.js"
+	type="text/javascript"></script>
+
+<div id="sun4all-tutorial" class="row">
 	<div class="span12">
 		<div id="modal" class="modal hide fade"
 			style="width: 670px; left: 48%;">
 			<div class="modal-header">
-				<h3>Sun4All Tutorial</h3>
+				<h3 id="tutorial-title"></h3>
 			</div>
 			<div id="0" class="modal-body"
 				style="display: none; text-align: center;">
-				<span> <strong>Hello!</strong><br> <br> First of
-					all, thank you so much for giving us your time to help us with
-					Sun4All! This tutorial will maximize your experience and
-					contribution, so please, read it carefully. <br> <br> The
-					project is based on an asset of over 30000 images of the Sun
-					(spectroheliograms) that are kept at the Astronomical Observatory
-					of the University of Coimbra, as result of a work of over 80 years
-					of daily solar observations, started in 1926. <br> <br>
-					The analysis and counting of the sunspots is a very important
-					aspect of the study of the phenomena occurring on the surface of
-					Sun and to understand the solar activity and solar cycle. On the
-					other hand studying the sunspots, besides being interesting itself,
-					presents an important tool to understand much of what happens on
-					the Earth climate. <br> <br> Thank you for your
-					collaboration!
-				</span>
+				<span id="tutorial-p1"> </span>
 				<div style="margin: 0px auto; width: 446px;">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sun4all-icon.png"
+						src="/sun4all/images/sun4all-icon.png"
 						style="width: 35%; float: left;"> <img
-						src="http://societic.ibercivis.es/sun4all/static/images/socientize-icon.png"
+						src="/sun4all/images/socientize-icon.png"
 						style="width: 54%; margin-top: 40px;">
 				</div>
 			</div>
 			<div id="1" class="modal-body" style="display: none">
 				<img
-					src="http://societic.ibercivis.es/sun4all/static/images/sun4all-header.png">
+					src="/sun4all/images/sun4all-header.png">
 				<div>
-					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sun4all-example-photo.png"
+					<img id="sun4all-example-photo"
+						src="/sun4all/images/sun4all-example-photo.png"
 						style="float: left; width: 50%; margin-left: 5px; margin-right: 10px; padding-bottom: 49px;">
-					<span style="display: block; padding-top: 15px;"> In this
-						application you’ll find an image of the sun - a spectroheliogram -
-						dated with the day when was taken. The one used in this example
-						was taken in September, 03 – 1980 (see above the picture). <br>
-						<br> The purpose of this application is to count sunspots and
-						sunspots groups. To do that, we provide you with tools to <strong>manipulate
-							the image</strong> and <strong>to do the counting</strong>. <br> <br>
-						You can use icon <img
-						src="http://societic.ibercivis.es/sun4all/static/images/sun4all-info-icon.png"
-						style="width: 30px;"> to get more information about the
-						application and also the social network icons to spread the word!
-						<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sun4all-social-icons.png"
+					<span style="display: block; padding-top: 15px;"> <span
+						id="tutorial-p2-1"></span> <img
+						src="/sun4all/images/sun4all-info-icon.png"
+						style="width: 30px;"> <span id="tutorial-p2-2"></span> <img
+						src="/sun4all/images/sun4all-social-icons.png"
 						style="width: 110px;">
 					</span>
 				</div>
 			</div>
 			<div id="2" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					First of all, what can be considered as a <strong>sunspot</strong>
-					and a <strong>sunspot group</strong>?
-				</div>
+				<div id="tutorial-p3-1" style="margin-bottom: 10px;"></div>
 				<div id="sunspot-panel">
 					<div>
-						<h2>SUNSPOT</h2>
-						<div style="margin-bottom: 10px;">A sunspot is every single
-							spot you might detect in the surface of the sun. Here you have
-							some examples:</div>
+						<h2 class="sunspot-label" style="text-transform: uppercase"></h2>
+						<div id="tutorial-p3-2" style="margin-bottom: 10px;"></div>
 					</div>
 					<div class="sunspot-row">
 						<div class="sunspot-images-container" style="margin-right: 56px;">
 							<img
-								src="http://societic.ibercivis.es/sun4all/static/images/sunspot_1.png"
+								src="/sun4all/images/sunspot_1.png"
 								style="width: 90px;">
 							<h5>
-								<strong>1</strong> Sunspot
+								<strong>1</strong> <span class="sunspot-label"></span>s
 							</h5>
 						</div>
 						<div class="sunspot-images-container">
 							<img
-								src="http://societic.ibercivis.es/sun4all/static/images/sunspot_2.png"
+								src="/sun4all/images/sunspot_2.png"
 								style="width: 95px;">
 							<h5>
-								<strong>2</strong> Sunspots
+								<strong>2</strong> <span class="sunspot-label"></span>s
 							</h5>
 						</div>
 					</div>
 					<div class="sunspot-row">
 						<div class="sunspot-images-container" style="margin-right: 20px;">
 							<img
-								src="http://societic.ibercivis.es/sun4all/static/images/sunspot_3.png"
+								src="/sun4all/images/sunspot_3.png"
 								style="width: 86px;">
 							<h5 style="margin-bottom: 0px;">
-								<strong>3</strong> Sunspots
+								<strong>3</strong> <span class="sunspot-label"></span>
 							</h5>
 						</div>
 						<div class="sunspot-images-container">
 							<img
-								src="http://societic.ibercivis.es/sun4all/static/images/sunspot_4.png"
+								src="/sun4all/images/sunspot_4.png"
 								style="width: 138px;">
 							<h5 style="margin-bottom: 0px; margin-left: 36px;">
-								<strong>4</strong> Sunspots
+								<strong>4</strong> <span class="sunspot-label"></span>s
 							</h5>
 						</div>
 					</div>
 				</div>
 				<div id="sunspot-group-panel">
 					<div>
-						<h2>SUNSPOT GROUP</h2>
-						<div style="margin-bottom: 10px;">A sunspot group is
-							considered to be a group of one or more sunspots. Look at this
-							example:</div>
+						<h2 class="sunspot-group-label" style="text-transform: uppercase"></h2>
+						<div id="tutorial-p3-3" style="margin-bottom: 10px;"></div>
 					</div>
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_group.png"
+						src="/sun4all/images/sunspot_group.png"
 						style="width: 252px; margin-top: 11px;">
 				</div>
 			</div>
 			<div id="3" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					To <strong>manipulate the image</strong>, you have several buttons
-					located at the bottom of the image that you can use:
-				</div>
-				<img
-					src="http://societic.ibercivis.es/sun4all/static/images/image_toolbar.png"
+				<div class="tutorial-p4-1" style="margin-bottom: 10px;"></div>
+
+				<img class="sun4all-image-toolbar"
+					src="/sun4all/images/image_toolbar.png"
 					style="display: block; margin: 0px auto; margin-bottom: 10px;">
+
 				<div class="toolbar-info">
-					To change the size of the image you can: <br> Amplify <img
-						src="http://societic.ibercivis.es/sun4all/static/images/zoom_in.png">,
-					reduce <img
-						src="http://societic.ibercivis.es/sun4all/static/images/zoom_out.png">,
-					or reset the size of the image <img
-						src="http://societic.ibercivis.es/sun4all/static/images/reset_zoom.png">.
+					<span id="tutorial-p4-2"></span><img
+						src="/sun4all/images/zoom_in.png">,
+					<span id="tutorial-p4-3"></span><img
+						src="/sun4all/images/zoom_out.png">,
+					<span id="tutorial-p4-4"></span>
+					<img id="sun4all-reset-zoom" src='/sun4all/images/reset_zoom.png'>.
 				</div>
 				<div class="toolbar-info">
-					To move the image you can: <br> Move the image down <img
-						src="http://societic.ibercivis.es/sun4all/static/images/down.png">,
-					up <img
-						src="http://societic.ibercivis.es/sun4all/static/images/up.png">,
-					left <img
-						src="http://societic.ibercivis.es/sun4all/static/images/left.png">
-					or right <img
-						src="http://societic.ibercivis.es/sun4all/static/images/right.png">.
+					<span id="tutorial-p4-5"></span><img
+						src="/sun4all/images/down.png">,
+					<span id="tutorial-p4-6"></span><img
+						src="/sun4all/images/up.png">,
+					<span id="tutorial-p4-7"></span><img
+						src="/sun4all/images/left.png">
+					<span id="tutorial-p4-8"></span><img
+						src="/sun4all/images/right.png">.
 				</div>
 			</div>
 			<div id="4" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					To <strong>manipulate the image</strong>, you have several buttons
-					located at the bottom of the image that you can use:
-				</div>
-				<img
-					src="http://societic.ibercivis.es/sun4all/static/images/image_toolbar.png"
+				<div class="tutorial-p4-1" style="margin-bottom: 10px;"></div>
+				<img class="sun4all-image-toolbar"
+					src="/sun4all/images/image_toolbar.png"
 					style="display: block; margin: 0px auto; margin-bottom: 10px;">
 
-				<div style="margin-bottom: 10px; margin-left: 10px;">You also
-					can INVERT THE IMAGE between negative and positive to detect
-					sunspots more easily.</div>
+				<div id="tutorial-p5-1"
+					style="margin-bottom: 10px; margin-left: 10px;"></div>
 
 				<div class="toolbar-info" style="height: 140px;">
 					<div
 						style="margin-left: 50px; margin-right: 100px; margin-top: 50px; float: left;">
-						<img
-							src="http://societic.ibercivis.es/sun4all/static/images/invert_image.png">
+						<img id="sun4all-invert-image"
+							src="/sun4all/images/invert_image.png">
 					</div>
 					<div style="margin-top: 10px; margin-right: 50px; float: left;">
 						<img
-							src="http://societic.ibercivis.es/sun4all/static/images/inverted_image_1.png"
+							src="/sun4all/images/inverted_image_1.png"
 							style="width: 120px;">
-						<div style="text-align: center;">Negative</div>
+						<div style="text-align: center;">
+							<span id="tutorial-p5-2"></span>
+						</div>
 					</div>
 					<div style="margin-top: 10px; float: left;">
 						<img
-							src="http://societic.ibercivis.es/sun4all/static/images/inverted_image_2.png"
+							src="/sun4all/images/inverted_image_2.png"
 							style="width: 120px;">
-						<div style="text-align: center;">Positive</div>
+						<div style="text-align: center;">
+							<span id="tutorial-p5-3"></span>
+						</div>
 					</div>
 				</div>
-				<div style="margin-left: 10px;">In an image in negative
-					sunspots appear as white spots and in positive the sunspots appear
-					as black spots.</div>
+				<div id="tutorial-p5-4" style="margin-left: 10px;"></div>
 			</div>
 			<div id="5" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					<strong>To mark the sunspots or sunspot groups</strong>, you have
-					located at the right side of the image the “Observation” box:
-				</div>
+				<div id="tutorial-p6-1" style="margin-bottom: 10px;"></div>
 				<div class="box-info" style="padding-bottom: 5px;">
-					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/observation_box.png">
-					<div style="margin-top: 32px;">
-						The <strong>Observation box</strong> will help you to analyse the
-						image by allowing you to “Add Sunspots”, “Add Sunspot Group”, and
-						“Add Information” that you may find relevant. <br> <br>
-						Additionally, if you wrongly marked a sunspot or sunspot group,
-						you can select it by clicking on the circle surrounding it, and
-						then clicking on the button “Remove a Sunspot / Group”.
-					</div>
+					<img id="sun4all-observation-box"
+						src="/sun4all/images/observation_box.png">
+					<div id="tutorial-p6-2" style="margin-top: 32px;"></div>
 				</div>
 			</div>
 			<div id="6" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					<strong>To mark sunspots</strong> just follow the next steps:
+				<div id="tutorial-p7-1" style="margin-bottom: 10px;"></div>
+				<div class="box-info">
+					<img
+						src="/sun4all/images/sunspot_step_1.png"
+						style="width: 125px;">
+					<div id="tutorial-p7-2" style="margin-top: 30px;"></div>
 				</div>
 				<div class="box-info">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_step_1.png"
+						src="/sun4all/images/sunspot_step_2.png"
 						style="width: 125px;">
-					<div style="margin-top: 30px;">1) First you have to create a
-						square around the area you want to cover. To do this, click on the
-						image using the left button of the mouse.</div>
+					<div id="tutorial-p7-3" style="margin-top: 20px;"></div>
 				</div>
 				<div class="box-info">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_step_2.png"
+						src="/sun4all/images/sunspot_step_3.png"
 						style="width: 125px;">
-					<div style="margin-top: 20px;">2) Then, you can adjust the
-						square to your spot easily by clicking in the square and dragging
-						it to the position you want.</div>
-				</div>
-				<div class="box-info">
-					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_step_3.png"
-						style="width: 125px;">
-					<div style="margin-top: 20px;">3) Finally, you have to go to
-						the “Observation” box and click on “Add Sunspot” button which will
-						mark your spot with a yellow circle!</div>
+					<div id="tutorial-p7-4" style="margin-top: 20px;"></div>
 				</div>
 			</div>
 
 			<div id="7" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">
-					<strong>To mark sunspot groups</strong> just follow the next steps:
+				<div id="tutorial-p8-1" style="margin-bottom: 10px;"></div>
+				<div class="box-info">
+					<img
+						src="/sun4all/images/sunspot_group_step_1.png"
+						style="width: 100px;">
+					<div id="tutorial-p8-2" style="margin-top: 30px;"></div>
 				</div>
 				<div class="box-info">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_group_step_1.png"
+						src="/sun4all/images/sunspot_group_step_2.png"
 						style="width: 100px;">
-					<div style="margin-top: 30px;">1) First you have to create a
-						square around the area you want to cover. To do this, click on the
-						image using the left button of the mouse.</div>
+					<div id="tutorial-p8-3" style="margin-top: 20px;"></div>
 				</div>
 				<div class="box-info">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_group_step_2.png"
+						src="/sun4all/images/sunspot_group_step_3.png"
 						style="width: 100px;">
-					<div style="margin-top: 20px;">2) As before, you can adjust
-						the square to your group easily by clicking in the square and
-						dragging it to the position you want.</div>
-				</div>
-				<div class="box-info">
-					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sunspot_group_step_3.png"
-						style="width: 100px;">
-					<div style="margin-top: 20px;">3) Finally, you have to go to
-						the “Observation” box and click on “Add Sunspot Group” button
-						which will mark your group with a blue circle!</div>
+					<div id="tutorial-p8-4" style="margin-top: 20px;"></div>
 				</div>
 			</div>
 
 			<div id="8" class="modal-body" style="display: none">
-				<div style="margin-bottom: 10px;">The summary of your analysis
-					appears in “Your Data” box:</div>
+				<div id="tutorial-p9-1" style="margin-bottom: 10px;"></div>
 				<div class="box-info">
-					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/your_data_box.png">
-					<div style="margin-top: 50px;">
-						The <strong>“Your Data” box</strong> summarises your analysis by
-						telling you how many sunspots and sunspot groups you have counted
-						so far. <br> <br>It also allows you to “Finish the task”
-						or to “Start over” the analysis.
-					</div>
+					<img id="sun4all-your-data-box"
+						src="/sun4all/images/your_data_box.png">
+					<div id="tutorial-p9-2" style="margin-top: 50px;"></div>
 				</div>
 			</div>
 			<div id="9" class="modal-body"
 				style="display: none; text-align: center;">
-				<span>Once you have counted every sunspots and sunspot groups
-					in the spectroheliogram, you just have to click on the “Finish
-					Task” button! <br> <br> Now you are ready to start
-					contributing! You can also check on the <a
-					href="http://www.mat.uc.pt/~sun4all/index.php/en/supporting-material?download=33:projects-guidebook)
-					of Sun4All!"
-					target="_blank">didactic unit</a>. <br> <br> Thank you so
-					much for your time and have fun!
-				</span>
+				<span id="tutorial-p10-1"></span> <a id="didactic-unit"
+					href="http://www.mat.uc.pt/~sun4all/index.php/en/supporting-material?download=33:projects-guidebook"
+					target="_blank"></a><span id="tutorial-p10-2"></span>
 				<div style="margin: 0px auto; width: 446px;">
 					<img
-						src="http://societic.ibercivis.es/sun4all/static/images/sun4all-icon.png"
+						src="/sun4all/images/sun4all-icon.png"
 						style="width: 35%; float: left;"> <img
-						src="http://societic.ibercivis.es/sun4all/static/images/socientize-icon.png"
+						src="/sun4all/images/socientize-icon.png"
 						style="width: 54%; margin-top: 40px;">
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a id="prevBtn" href="#" onclick="showStep('prev')" class="btn">Previous</a>
+				<a id="prevBtn" href="#" onclick="showStep('prev')" class="btn"></a>
 				<a id="nextBtn" href="#" onclick="showStep('next')"
-					class="btn btn-success">Next</a> <a id="startContrib"
+					class="btn btn-success"></a> <a id="startContrib"
 					href="../Sun4All/newtask" class="btn btn-primary"
-					style="display: none"><i class="icon-thumbs-up"></i> Start
-					contributing!</a>
+					style="display: none;"><i class="icon-thumbs-up"
+					style="margin-right: 5px;"></i><span id="startContrib-label"></span>
+				</a>
 			</div>
 		</div>
 	</div>
 </div>
 <script>
+	$("#sun4all-tutorial").ready(function() {
+		$("#tutorial-title").text($.i18n._('tutorial-title'));
+		$("#tutorial-p1").html($.i18n._('tutorial-p1'));
+		$("#tutorial-p2-1").html($.i18n._('tutorial-p2-1'));
+		$("#tutorial-p2-2").html($.i18n._('tutorial-p2-2'));
+		$("#tutorial-p3-1").html($.i18n._('tutorial-p3-1'));
+		$("#tutorial-p3-2").html($.i18n._('tutorial-p3-2'));
+		$("#tutorial-p3-3").html($.i18n._('tutorial-p3-3'));
+		$(".tutorial-p4-1").html($.i18n._('tutorial-p4-1'));
+		$("#tutorial-p4-2").html($.i18n._('tutorial-p4-2'));
+		$("#tutorial-p4-3").html($.i18n._('tutorial-p4-3'));
+		$("#tutorial-p4-4").html($.i18n._('tutorial-p4-4'));
+		$("#tutorial-p4-5").html($.i18n._('tutorial-p4-5'));
+		$("#tutorial-p4-6").html($.i18n._('tutorial-p4-6'));
+		$("#tutorial-p4-7").html($.i18n._('tutorial-p4-7'));
+		$("#tutorial-p4-8").html($.i18n._('tutorial-p4-8'));
+		$("#tutorial-p5-1").html($.i18n._('tutorial-p5-1'));
+		$("#tutorial-p5-2").html($.i18n._('tutorial-p5-2'));
+		$("#tutorial-p5-3").html($.i18n._('tutorial-p5-3'));
+		$("#tutorial-p5-4").html($.i18n._('tutorial-p5-4'));
+		$("#tutorial-p6-1").html($.i18n._('tutorial-p6-1'));
+		$("#tutorial-p6-2").html($.i18n._('tutorial-p6-2'));
+		$("#tutorial-p7-1").html($.i18n._('tutorial-p7-1'));
+		$("#tutorial-p7-2").html($.i18n._('tutorial-p7-2'));
+		$("#tutorial-p7-3").html($.i18n._('tutorial-p7-3'));
+		$("#tutorial-p7-4").html($.i18n._('tutorial-p7-4'));
+		$("#tutorial-p8-1").html($.i18n._('tutorial-p8-1'));
+		$("#tutorial-p8-2").html($.i18n._('tutorial-p8-2'));
+		$("#tutorial-p8-3").html($.i18n._('tutorial-p8-3'));
+		$("#tutorial-p8-4").html($.i18n._('tutorial-p8-4'));
+		$("#tutorial-p9-1").html($.i18n._('tutorial-p9-1'));
+		$("#tutorial-p9-2").html($.i18n._('tutorial-p9-2'));
+		$("#tutorial-p10-1").html($.i18n._('tutorial-p10-1'));
+		$("#tutorial-p10-2").html($.i18n._('tutorial-p10-2'));
+
+		$("#didactic-unit").text($.i18n._('didactic-unit'));
+		$("#prevBtn").text($.i18n._('prevBtn'));
+		$("#nextBtn").text($.i18n._('nextBtn'));
+		$("#startContrib-label").text($.i18n._('startContrib-label'));
+		$(".sunspot-label").text($.i18n._('sunspot-label'));
+		$(".sunspot-group-label").text($.i18n._('sunspot-group-label'));
+		
+		$("#sun4all-example-photo").attr("src", $.i18n._('sun4all-example-photo'));
+		$(".sun4all-image-toolbar").attr("src", $.i18n._('sun4all-image-toolbar'));
+		$("#sun4all-reset-zoom").attr("src", $.i18n._('sun4all-reset-zoom'));
+		$("#sun4all-invert-image").attr("src", $.i18n._('sun4all-invert-image'));
+		$("#sun4all-observation-box").attr("src", $.i18n._('sun4all-observation-box'));
+		$("#sun4all-your-data-box").attr("src", $.i18n._('sun4all-your-data-box'));
+	});
+
 	var step = -1;
 	function showStep(action) {
 		$("#" + step).hide();

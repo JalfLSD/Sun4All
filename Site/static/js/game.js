@@ -459,8 +459,7 @@ function done() {
 		answer += createAnEntry('cluster', cornerX, cornerY, cluster.getWidth());
 	}
 	
-	console.log(answer);
-	/*pybossa.saveTask(taskId, answer).done(
+	pybossa.saveTask(taskId, answer).done(
 			function (data) {
 				// Show dialog
 				$('#completedDialog').modal('show');
@@ -470,5 +469,5 @@ function done() {
 				pybossa.newTask(app_shortname).done(function(data) {
 					start(data);
 				});
-			});*/
+			});
 }

@@ -1,4 +1,4 @@
-﻿var circleSelected = null;
+﻿var markSelected = null;
 var spotCount = 0;
 var clusterCount = 0;
 
@@ -6,7 +6,6 @@ var spots = new Array();
 var clusters = new Array();
 
 var taskId = 0;
-var deferredTask;
 
 var layer = new Kinetic.Layer();
 var sun;
@@ -19,6 +18,7 @@ var currentImage = "";
 var normalImage, invImage;
 var selection = null;
 var dragging = false;
+var DEFAULT_CROSS_WIDTH = 20;
 
 /* MISC Functions */
 function ChangeImage(img, url) {
@@ -31,11 +31,115 @@ function openShareWindow(url) {
 
 document.onkeydown = function (evt) { 
 	if (typeof evt.keyCode != "undefined" && evt.keyCode == 46) {
-		removeSelectedCircle();
+		removeSelectedMark();
 	}
 };
 
+$('body').on('mousedown', function(evt) {
+	if (evt.target.tagName == "BODY") {
+		document.body.style.cursor = 'default';	
+		$("#btnAddSpot").removeAttr("disabled");
+		$("#btnAddCluster").removeAttr("disabled");
+		$("#removeSpotOrCluster").prop("disabled", 'true');	
+	}
+});
+
 /*** Main Functions ***/
+function CrossShape(posX, posY, color, width) {
+	this.width = width;
+	
+	this.shape = new Kinetic.Shape({
+		x: posX,
+		y: posY,
+		drawFunc: function(context) {
+			var halfWidth = width/2;
+			context.beginPath();
+			context.moveTo((-1)*halfWidth, 0);
+			context.lineTo(halfWidth, 0);
+			context.moveTo(0, (-1)*halfWidth);
+			context.lineTo(0, halfWidth);
+			context.closePath();
+			context.fillStrokeShape(this);
+		},
+		drawHitFunc: function(context) {
+			var startPointX = (-1)*(width/2);
+			var startPointY = (-1)*(width/2);
+			
+			// a rectangle around the cross
+			context.beginPath();
+			context.moveTo(startPointX, startPointY);
+			context.lineTo(startPointX+width, startPointY);
+			context.lineTo(startPointX+width, startPointY+width);
+			context.lineTo(startPointX, startPointY+width);
+			context.closePath();
+			context.fillStrokeShape(this);
+		},				
+		stroke: color,
+		strokeWidth: 2,
+		draggable: true
+	});
+
+	this.shape.on('mouseover', function() {
+		document.body.style.cursor = 'move';
+	});
+	
+	this.shape.on('mouseout', function() {
+		if ($("#btnAddSpot").is(":disabled") ||
+				$("#btnAddCluster").is(":disabled")) {
+			document.body.style.cursor = 'crosshair';
+		} else {
+			document.body.style.cursor = 'default';	
+		}
+	});
+	
+	this.shape.on("click", function(){
+		setSelectedMark(findMark(this));
+	})
+}
+
+CrossShape.prototype.getShape = function(){
+	return this.shape;
+}
+
+CrossShape.prototype.getPosition = function(){
+	return this.shape.getPosition();
+}
+
+CrossShape.prototype.getWidth = function(){
+	return this.width;
+}
+
+function createCluster(posX, posY) {
+	var origX = posX / scale;
+	var origY = posY / scale;
+	var cross = new CrossShape(origX, origY, "blue", DEFAULT_CROSS_WIDTH);
+	
+	clusters[clusterCount] = cross;
+	clusterCount++;
+	$('#lblclusterCount').text(clusterCount);
+
+	setSelectedMark(cross);
+	layer.add(cross.getShape());
+	layer.draw();
+}
+
+function createSpot(posX, posY) {
+	var origX = posX / scale;
+	var origY = posY / scale;
+	var cross = new CrossShape(origX, origY, "yellow", DEFAULT_CROSS_WIDTH);
+	
+	spots[spotCount] = cross;
+	spotCount++;
+	$('#lblspotCount').text(spotCount);
+	
+	setSelectedMark(cross);
+	layer.add(cross.getShape());
+	layer.draw();
+}
+
+function createAnEntry(type, posX, posY, shapeWidth) {
+	return "~" + type + ":{" + posX + "," + posY + "," + shapeWidth + "," + shapeWidth + "}";
+}
 
 function setupKinect() {
 	stage = new Kinetic.Stage({
@@ -63,67 +167,22 @@ function setupKinect() {
 	stage.add(layer);
 
 	stage.getContainer().addEventListener('mousedown', function(evt) {
-		var shape = evt.targetNode;
-		if (shape.className == "Circle") {
-			setSelectedCircle(shape);
-		} else {
-			clearSelectedCircle();
-		}
-
+		
+		var target = evt.targetNode;
+		
+		if ($("#btnAddSpot").is(":enabled") && $("#btnAddCluster").is(":enabled") || 
+				typeof target != "undefined" && target.className != "Image") return;
+		
 		var pos = stage.getMousePosition();
-		if (selection != null) {
-			if (selection.intersects(pos)) {
-				document.body.style.cursor = 'move';
-				return;
-			}
-			removeAreaSelection();
+		pos.x -= stage.attrs.x;
+		pos.y -= stage.attrs.y;
+		
+		if ($("#btnAddSpot").is(":disabled")) {
+			createSpot(pos.x, pos.y);
+		} else {
+			createCluster(pos.x, pos.y);
 		}
-
-		if (selection == null) {
-			// Add a new selection
-			pos.x -= stage.attrs.x;
-			pos.y -= stage.attrs.y;
-			selection = new Kinetic.Rect({
-				x: pos.x / scale,
-				y: pos.y / scale,
-				width: 0,
-				height: 0,
-				id: "selection",
-				stroke: 'red',
-				strokeWidth: 1,
-				draggable: true,
-			});
-
-			layer.add(selection);
-			layer.draw();
-			evt.cancelBubble = true;
-			dragging = true;
-		}
-	});
-
-	stage.getContainer().addEventListener('mouseup', function(evt) {
-		dragging = false;
-		document.body.style.cursor = 'default';
-
-		if (selection != null && selection.getWidth() > 0) {
-			// Enable buttons
-			$("#btnAddSpot").removeAttr("disabled");
-			$("#btnAddCluster").removeAttr("disabled");
-		}
-	});
-
-	stage.getContainer().addEventListener('mousemove', function(evt) {
-		if (dragging) {
-			var pos = stage.getMousePosition();
-			pos.x -= stage.attrs.x;
-			pos.y -= stage.attrs.y;
-			pos.x /= scale;
-			pos.y /= scale;
-			selection.attrs.width = pos.x - selection.attrs.x;
-			selection.attrs.height = selection.attrs.width;
-			layer.draw();
-			evt.cancelBubble = true;
-		}
+		evt.cancelBubble = true;
 	});
 
 	// Keep the picture inside the div
@@ -152,9 +211,6 @@ function setupKinect() {
 			stage.draw();
 		}
 	});
-
-	// Load images
-	loadImages();
 }
 
 function invertImage() {
@@ -198,14 +254,17 @@ function doZoom(level) {
 	if (stage.getScale().x < 1)
 		stage.setScale(1);
 
-	if (level > 0)
+	if (level > 0) {
 		stage.setPosition(stage.attrs.x - 2, stage.attrs.y - 2);
-	else stage.setPosition(stage.attrs.x + 2, stage.attrs.y + 2);
+	}
+	else {
+		stage.setPosition(stage.attrs.x + 2, stage.attrs.y + 2);
+	}
 
 	keepInViewPort();
 	stage.draw();
 
-	scale = stage.getScale().x + level;
+	scale = stage.getScale().x;
 	scaledImageSize = imageSize * scale;
 }
 
@@ -286,78 +345,68 @@ function loadImages() {
 	invImage.src = "http://societic.ibercivis.es/sun4all/sunimages/inv/" + currentImage;
 }
 
-function drawSelection(color) {
-	var r = selection.attrs.width / 2;
-
-	var circle = new Kinetic.Circle({
-		radius: r,
-		stroke: color,
-		name: "spot",
-		x: selection.attrs.x + r,
-		y: selection.attrs.y + r,
-		strokeWidth: 1
-	});
-
-	layer.add(circle);
-	layer.draw();
-	return circle;
+function findMark(shape) {
+	var marks = shape.getStroke() == 'yellow' ? spots : clusters;
+	for (var i = 0; i < marks.length; i++) {
+		var pos = shape.getPosition();
+		var markPos = marks[i].getPosition();
+		if (pos.x == markPos.x && pos.y == markPos.y) {
+			return marks[i];
+		}
+	}
 }
 
-function setSelectedCircle(circle) {
-	circleSelected = circle;
+function setSelectedMark(mark) {
+	markSelected = mark;
 	$("#removeSpotOrCluster").removeAttr("disabled");
 }
 
-function clearSelectedCircle() {
-	circleSelected = null;
+function clearSelectedMark() {
+	markSelected = null;
 	$("#removeSpotOrCluster").prop("disabled", 'true');
 }
 
-function removeSelectedCircle() {
-	if (circleSelected == null) return; 
+function removeSelectedMark() {
+	if (markSelected == null) return; 
 
-	var r = circleSelected.attrs.radius;
-	var entryType = circleSelected.getStroke() == 'yellow' ? 'spot' : 'cluster';
-	var entry = createAnEntry(entryType, circleSelected.attrs.x - r, circleSelected.attrs.y - r, r * 2);
-	
+	var shape = markSelected.getShape();
+	var entryType = shape.getStroke() == 'yellow' ? 'spot' : 'cluster';
+
 	if (entryType == 'spot') {
-		spots.splice(spots.indexOf(entry), 1);
+		spots.splice(spots.indexOf(markSelected), 1);
 		spotCount--;
 		$('#lblspotCount').text(spotCount);
 	} else {
-		clusters.splice(clusters.indexOf(entry), 1);
+		clusters.splice(clusters.indexOf(markSelected), 1);
 		clusterCount--;
 		$('#lblclusterCount').text(clusterCount);
 	}
-	
-	circleSelected.remove();
+
+	shape.remove();
 	layer.draw();
-	clearSelectedCircle();
+	clearSelectedMark();
 }
 
-function addSpot() {
-	spots[spotCount] = createAnEntry("spot", selection.attrs.x, selection.attrs.y, selection.attrs.width);
-	spotCount++;
-	$('#lblspotCount').text(spotCount);
-	circle = drawSelection("yellow");
-	setSelectedCircle(circle);
-	$('#pictureCanvas').show();
+function enableAddSpot() {
+	document.body.style.cursor = "crosshair";
+	$("#btnAddSpot").prop("disabled", 'true');
+	$("#btnAddCluster").removeAttr("disabled");
 }
 
-function addCluster() {
-	clusters[clusterCount] = createAnEntry("cluster", selection.attrs.x, selection.attrs.y, selection.attrs.width);
-	clusterCount++;
-	$('#lblclusterCount').text(clusterCount);
-	circle = drawSelection("blue");
-	setSelectedCircle(circle);
-	$('#pictureCanvas').show();
-}
-
-function createAnEntry(type, posX, posY, shapeWidth) {
-	return "~" + type + ":{" + posX + "," + posY + "," + shapeWidth + "," + shapeWidth + "}";
+function enableAddCluster() {
+	document.body.style.cursor = "crosshair";
+	$("#btnAddCluster").prop("disabled", 'true');
+	$("#btnAddSpot").removeAttr("disabled");
 }
 
 function startOver() {
+	//reset canvas
+	for (var i = 0; i < spots.length; i++)
+		spots[i].getShape().remove();
+	
+	for (var i = 0; i < clusters.length; i++)
+		clusters[i].getShape().remove();
+	
 	spotCount = 0;
 	clusterCount = 0;
 	spots = new Array();
@@ -365,13 +414,7 @@ function startOver() {
 	$('#lblclusterCount').text(clusterCount);
 	$('#lblspotCount').text(spotCount);
 
-	//reset canvas
-	var selections = layer.get('.spot');
-	for (var i = 0; i < selections.length; i++)
-		selections[i].remove();
-
-	clearSelectedCircle();
-	removeAreaSelection();
+	clearSelectedMark();
 	reset();
 	layer.draw();
 
@@ -379,20 +422,14 @@ function startOver() {
 	$('#txtObservation').val('');
 }
 
-function removeAreaSelection() {
-	if (selection == null) return;
-
-	selection.remove();
-	selection = null;
-	$("#btnAddSpot").prop("disabled", 'true');
-	$("#btnAddCluster").prop("disabled", 'true');
-}
-
 //Start a new game round
-function start(task, deferred) {
+function start(data) {
+
+	var task = data.task;
+	if ($.isEmptyObject(task)) return;
+
 	// Get task info
 	taskId = task.id;
-	deferredTask = deferred;
 
 	// start!
 	currentImage = task.info.image;
@@ -405,19 +442,33 @@ function done() {
 	var answer = spotCount + "~" + clusterCount + "~" + $('#txtObservation').val();
 	// add spots
 	for (i = 0; i < spotCount; i++) {
-		answer += spots[i];
+		var spot = spots[i];
+		var pos = spot.getPosition();
+		var cornerX = pos.x - (spot.getWidth()/2);
+		var cornerY = pos.y - (spot.getWidth()/2);
+		
+		answer += createAnEntry('spot', cornerX, cornerY, spot.getWidth());
 	}
 	// add clusters
 	for (i = 0; i < clusterCount; i++) {
-		answer += clusters[i];
+		var cluster = clusters[i];
+		var pos = cluster.getPosition();
+		var cornerX = pos.x - (cluster.getWidth()/2);
+		var cornerY = pos.y - (cluster.getWidth()/2);
+		
+		answer += createAnEntry('cluster', cornerX, cornerY, cluster.getWidth());
 	}
-	pybossa.saveTask(taskId, answer).done(
+	
+	console.log(answer);
+	/*pybossa.saveTask(taskId, answer).done(
 			function (data) {
 				// Show dialog
 				$('#completedDialog').modal('show');
 				// Fade out the pop-up after a 1000 miliseconds
 				//setTimeout(function() { $("#success").fadeOut() }, 1000);             
 				startOver();
-				deferredTask.resolve();
-			});
+				pybossa.newTask(app_shortname).done(function(data) {
+					start(data);
+				});
+			});*/
 }

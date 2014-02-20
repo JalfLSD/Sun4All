@@ -1,28 +1,9 @@
 ﻿<link href="/sun4all/styles.css" rel="stylesheet" type="text/css">
 
-<script src="/sun4all/js/kinetic-v4.7.2.min.js"
-	type="text/javascript"></script>
-
+<script src="/sun4all/js/kinetic-v4.7.2.min.js" type="text/javascript"></script>
 <script src="/sun4all/js/game.js" type="text/javascript"></script>
 <script src="/sun4all/js/jquery.i18n.min.js" type="text/javascript"></script>
 <script src="/sun4all/js/sun4all.i18n.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-	pybossa.taskLoaded(function(task, deferred) {
-		deferred.resolve(task);
-	});
-
-	pybossa.presentTask(function(task, deferred) {
-		if (!$.isEmptyObject(task)) {
-			start(task, deferred);
-		}
-	});
-
-	// run task
-	pybossa.setEndpoint("/pybossa");
-	pybossa.run('Sun4All');
-</script>
-
 
 <div id="mainDivGame" class="blockDiv">
 	<!--Header Div-->
@@ -71,14 +52,14 @@
 		style="position: relative; top: 0px; left: 610px; width: 200px; height: 313px; border: solid; padding: 10px;">
 		<fieldset>
 			<legend id="observation-title"> </legend>
-			<button id="btnAddSpot" class="btn btn-warning" disabled
-				type="button" style="width: 100%;" onclick="javascript:addSpot();"></button>
-			<button id="btnAddCluster" class="btn btn-primary" disabled
+			<button id="btnAddSpot" class="btn btn-warning" 
+				type="button" style="width: 100%;" onclick="javascript:enableAddSpot();"></button>
+			<button id="btnAddCluster" class="btn btn-primary" 
 				type="button" style="width: 100%; margin-top: 10px"
-				onclick="javascript:addCluster();"></button>
+				onclick="javascript:enableAddCluster();"></button>
 			<button id="removeSpotOrCluster" class="btn" disabled type="button"
 				style="width: 100%; margin-top: 10px"
-				onclick="javascript:removeSelectedCircle();"></button>
+				onclick="javascript:removeSelectedMark();"></button>
 			<label id="addInfoTxtBox" style="margin-top: 15px;"></label>
 			<textarea id="txtObservation"
 				style="width: 90%; height: 90px; resize: none;" rows="3"></textarea>
@@ -175,10 +156,10 @@
 			aria-hidden="true">×</button>
 		<h3 id="congratulations"></h3>
 	</div>
-	<div id="completed-task" class="modal-body">
-	</div>
+	<div id="completed-task" class="modal-body"></div>
 	<div class="modal-footer">
-		<button id="take-another-task" class="btn btn-success" data-dismiss="modal"></button>
+		<button id="take-another-task" class="btn btn-success"
+			data-dismiss="modal"></button>
 	</div>
 </div>
 
@@ -208,9 +189,12 @@
 	});
 
 	setupKinect();
-
-	//var templateServer = "localhost/sun4all/";
-	//var templateServer = "pybossa.socientize.eu/sun4all/static";
+	
+	var app_shortname = "Sun4All";
+	pybossa.setEndpoint("/pybossa");
+	pybossa.newTask(app_shortname).done(function(data) {
+		start(data);
+	});
 
 	function loadTutorial() {
 		$("#infoDialog").empty();

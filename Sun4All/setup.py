@@ -15,7 +15,7 @@ pyBossaApp = pbclient.find_app(short_name='Sun4All')[0];
 #pyBossaApp.long_description = '- add long description -';
 pyBossaApp.info['task_presenter'] = contents('../Site/static/templates/template.html')
 pyBossaApp.info['tutorial'] = contents('../Site/static/templates/tutorial.html')
-pyBossaApp.info['thumbnail'] = "http://societic.ibercivis.es/sun4all/static/images/icon2.jpg"
+pyBossaApp.info['thumbnail'] = "http://societic.ibercivis.es/sun4all/images/icon2.jpg"
 pyBossaApp.category_id = 2
 
 pbclient.update_app(pyBossaApp)

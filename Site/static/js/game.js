@@ -16,9 +16,8 @@ var scaledImageSize = 600;
 var inverted = false;
 var currentImage = "";
 var normalImage, invImage;
-var selection = null;
-var dragging = false;
-var DEFAULT_CROSS_WIDTH = 20;
+var clusterArea = null;
+var DEFAULT_CROSS_WIDTH = 12;
 
 /* MISC Functions */
 function ChangeImage(img, url) {
@@ -45,9 +44,27 @@ $('body').on('mousedown', function(evt) {
 });
 
 /*** Main Functions ***/
+
+function handleMouseOverShape() {
+	document.body.style.cursor = 'move';
+}
+
+function handleMouseOutShape() {
+	if ($("#btnAddSpot").is(":disabled") ||
+			$("#btnAddCluster").is(":disabled")) {
+		document.body.style.cursor = 'crosshair';
+	} else {
+		document.body.style.cursor = 'default';	
+	}
+}
+
+function handleMouseClickShape() {
+	setSelectedMark(findMark(this));
+}
+
 function CrossShape(posX, posY, color, width) {
 	this.width = width;
-	
+
 	this.shape = new Kinetic.Shape({
 		x: posX,
 		y: posY,
@@ -64,7 +81,7 @@ function CrossShape(posX, posY, color, width) {
 		drawHitFunc: function(context) {
 			var startPointX = (-1)*(width/2);
 			var startPointY = (-1)*(width/2);
-			
+
 			// a rectangle around the cross
 			context.beginPath();
 			context.moveTo(startPointX, startPointY);
@@ -79,22 +96,9 @@ function CrossShape(posX, posY, color, width) {
 		draggable: true
 	});
 
-	this.shape.on('mouseover', function() {
-		document.body.style.cursor = 'move';
-	});
-	
-	this.shape.on('mouseout', function() {
-		if ($("#btnAddSpot").is(":disabled") ||
-				$("#btnAddCluster").is(":disabled")) {
-			document.body.style.cursor = 'crosshair';
-		} else {
-			document.body.style.cursor = 'default';	
-		}
-	});
-	
-	this.shape.on("click", function(){
-		setSelectedMark(findMark(this));
-	})
+	this.shape.on('mouseover', handleMouseOverShape);
+	this.shape.on('mouseout', handleMouseOutShape);
+	this.shape.on("click", handleMouseClickShape);
 }
 
 CrossShape.prototype.getShape = function(){
@@ -109,17 +113,35 @@ CrossShape.prototype.getWidth = function(){
 	return this.width;
 }
 
+CrossShape.prototype.getClassName = function(){
+	return "Cross";
+}
+
 function createCluster(posX, posY) {
 	var origX = posX / scale;
 	var origY = posY / scale;
-	var cross = new CrossShape(origX, origY, "blue", DEFAULT_CROSS_WIDTH);
+
+	clusterArea = new Kinetic.Rect({
+					x: origX,
+					y: origY,
+					width: 0,
+					height: 0,
+					id: "selection",
+					stroke: 'blue',
+					strokeWidth: 1,
+					draggable: true,
+				});
 	
-	clusters[clusterCount] = cross;
+	clusterArea.on("mouseover", handleMouseOverShape);
+	clusterArea.on("mouseout", handleMouseOutShape);
+	clusterArea.on("click", handleMouseClickShape);
+
+	clusters[clusterCount] = clusterArea;
 	clusterCount++;
 	$('#lblclusterCount').text(clusterCount);
 
-	setSelectedMark(cross);
-	layer.add(cross.getShape());
+	setSelectedMark(clusterArea);
+	layer.add(clusterArea);
 	layer.draw();
 }
 
@@ -127,18 +149,22 @@ function createSpot(posX, posY) {
 	var origX = posX / scale;
 	var origY = posY / scale;
 	var cross = new CrossShape(origX, origY, "yellow", DEFAULT_CROSS_WIDTH);
-	
+
 	spots[spotCount] = cross;
 	spotCount++;
 	$('#lblspotCount').text(spotCount);
-	
+
 	setSelectedMark(cross);
 	layer.add(cross.getShape());
 	layer.draw();
 }
 
-function createAnEntry(type, posX, posY, shapeWidth) {
-	return "~" + type + ":{" + posX + "," + posY + "," + shapeWidth + "," + shapeWidth + "}";
+function createSpotEntry(posX, posY, shapeWidth) {
+	return "~spot:{" + posX + "," + posY + "}";
+}
+
+function createClusterEntry(posX, posY, shapeWidth) {
+	return "~cluster:{" + posX + "," + posY + "," + shapeWidth + "," + shapeWidth + "}";
 }
 
 function setupKinect() {
@@ -167,16 +193,16 @@ function setupKinect() {
 	stage.add(layer);
 
 	stage.getContainer().addEventListener('mousedown', function(evt) {
-		
+
 		var target = evt.targetNode;
-		
+
 		if ($("#btnAddSpot").is(":enabled") && $("#btnAddCluster").is(":enabled") || 
 				typeof target != "undefined" && target.className != "Image") return;
-		
+
 		var pos = stage.getMousePosition();
 		pos.x -= stage.attrs.x;
 		pos.y -= stage.attrs.y;
-		
+
 		if ($("#btnAddSpot").is(":disabled")) {
 			createSpot(pos.x, pos.y);
 		} else {
@@ -184,7 +210,30 @@ function setupKinect() {
 		}
 		evt.cancelBubble = true;
 	});
+	
+	stage.getContainer().addEventListener('mouseup', function(evt) {
+		if ($("#btnAddCluster").is(":enabled")) return;
+		
+		clusterArea = null;
+	});
 
+	stage.getContainer().addEventListener('mousemove', function(evt) {
+		
+		if ($("#btnAddCluster").is(":enabled")) return;
+		
+		if (clusterArea != null) {
+			var pos = stage.getMousePosition();
+			pos.x -= stage.attrs.x;
+			pos.y -= stage.attrs.y;
+			pos.x /= scale;
+			pos.y /= scale;
+			clusterArea.attrs.width = pos.x - clusterArea.attrs.x;
+			clusterArea.attrs.height = clusterArea.attrs.width;
+			layer.draw();
+			evt.cancelBubble = true;
+		}
+	});
+	
 	// Keep the picture inside the div
 	stage.on("dragmove", keepInViewPort);
 	// Zoom events
@@ -346,7 +395,7 @@ function loadImages() {
 }
 
 function findMark(shape) {
-	var marks = shape.getStroke() == 'yellow' ? spots : clusters;
+	var marks = shape.getClassName() == 'Rect' ? clusters : spots;
 	for (var i = 0; i < marks.length; i++) {
 		var pos = shape.getPosition();
 		var markPos = marks[i].getPosition();
@@ -369,20 +418,21 @@ function clearSelectedMark() {
 function removeSelectedMark() {
 	if (markSelected == null) return; 
 
-	var shape = markSelected.getShape();
-	var entryType = shape.getStroke() == 'yellow' ? 'spot' : 'cluster';
+	var entryType = markSelected.getClassName() == 'Cross' ? 'spot' : 'cluster';
 
 	if (entryType == 'spot') {
 		spots.splice(spots.indexOf(markSelected), 1);
 		spotCount--;
 		$('#lblspotCount').text(spotCount);
+		markSelected.getShape().remove();
+		
 	} else {
 		clusters.splice(clusters.indexOf(markSelected), 1);
 		clusterCount--;
 		$('#lblclusterCount').text(clusterCount);
+		markSelected.remove();
 	}
 
-	shape.remove();
 	layer.draw();
 	clearSelectedMark();
 }
@@ -403,10 +453,10 @@ function startOver() {
 	//reset canvas
 	for (var i = 0; i < spots.length; i++)
 		spots[i].getShape().remove();
-	
+
 	for (var i = 0; i < clusters.length; i++)
-		clusters[i].getShape().remove();
-	
+		clusters[i].remove();
+
 	spotCount = 0;
 	clusterCount = 0;
 	spots = new Array();
@@ -444,21 +494,16 @@ function done() {
 	for (i = 0; i < spotCount; i++) {
 		var spot = spots[i];
 		var pos = spot.getPosition();
-		var cornerX = pos.x - (spot.getWidth()/2);
-		var cornerY = pos.y - (spot.getWidth()/2);
-		
-		answer += createAnEntry('spot', cornerX, cornerY, spot.getWidth());
+		answer += createSpotEntry(pos.x, pos.y);
 	}
 	// add clusters
 	for (i = 0; i < clusterCount; i++) {
 		var cluster = clusters[i];
 		var pos = cluster.getPosition();
-		var cornerX = pos.x - (cluster.getWidth()/2);
-		var cornerY = pos.y - (cluster.getWidth()/2);
-		
-		answer += createAnEntry('cluster', cornerX, cornerY, cluster.getWidth());
+		answer += createClusterEntry(pos.x, pos.y, cluster.getWidth());
 	}
-	
+
+	//console.log(answer);
 	pybossa.saveTask(taskId, answer).done(
 			function (data) {
 				// Show dialog

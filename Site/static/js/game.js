@@ -17,7 +17,7 @@ var inverted = false;
 var currentImage = "";
 var normalImage, invImage;
 var clusterArea = null;
-var DEFAULT_CROSS_WIDTH = 12;
+var DEFAULT_CROSS_WIDTH = 6;
 
 /* MISC Functions */
 function ChangeImage(img, url) {
@@ -126,23 +126,35 @@ function createCluster(posX, posY) {
 					y: origY,
 					width: 0,
 					height: 0,
-					id: "selection",
 					stroke: 'blue',
 					strokeWidth: 1,
 					draggable: true,
+				    drawHitFunc: function (context) {
+			              context.beginPath();
+			              context.rect(0, 0, this.getWidth(), this.getHeight());
+			              context.closePath();
+			              context.setAttr('lineWidth', 10);
+			              context.setAttr('strokeStyle', this.colorKey);
+			              context.stroke();
+				    }
 				});
 	
 	clusterArea.on("mouseover", handleMouseOverShape);
 	clusterArea.on("mouseout", handleMouseOutShape);
 	clusterArea.on("click", handleMouseClickShape);
 
+	layer.add(clusterArea);
+	layer.draw();
+}
+
+function addCluster() {
+	if (clusterArea == null || clusterArea.getWidth() < 1) return; 
+	
 	clusters[clusterCount] = clusterArea;
 	clusterCount++;
 	$('#lblclusterCount').text(clusterCount);
-
 	setSelectedMark(clusterArea);
-	layer.add(clusterArea);
-	layer.draw();
+	clusterArea = null;
 }
 
 function createSpot(posX, posY) {
@@ -214,7 +226,7 @@ function setupKinect() {
 	stage.getContainer().addEventListener('mouseup', function(evt) {
 		if ($("#btnAddCluster").is(":enabled")) return;
 		
-		clusterArea = null;
+		addCluster();
 	});
 
 	stage.getContainer().addEventListener('mousemove', function(evt) {

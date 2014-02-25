@@ -1,0 +1,52 @@
+import psycopg2
+import sys
+
+def transform_spot_answer(spot_part):
+    coords_array = spot_part.replace("spot:{", "").replace("}","")
+    coords = coords_array.split(",")
+    
+    if len(coords) < 3:
+        return spot_part
+    
+    posX = float(coords[0])
+    posY = float(coords[1])
+    width = float(coords[2])
+    
+    centerX = posX + width/2
+    centerY = posY + width/2
+    
+    return "spot:{" + str(centerX) + "," + str(centerY) + "}"
+
+
+def transform_answer(answer):
+    parts = answer.split("~")
+
+    for part in parts:
+        if ("spot" in part):
+            answer = answer.replace(part, transform_spot_answer(part))
+            
+    return answer
+
+con = None
+
+try:
+    conn_string = "host='localhost' dbname='pybossa' user='postgres' password='postgres'"
+    con = psycopg2.connect(conn_string) 
+    cursor = con.cursor()
+    cursor.execute("SELECT id, info FROM task_run WHERE app_id = 5")
+    rows = cursor.fetchall()
+    
+    for row in rows:
+        new_info = transform_answer(row[1])
+        print(new_info)
+        cursor.execute("UPDATE task_run SET info='" + new_info + "' WHERE id=" + str(row[0]))
+
+    con.commit()
+
+except psycopg2.DatabaseError, e:
+    print 'Error %s' % e    
+    sys.exit(1) 
+
+finally:
+    if con:
+        con.close()

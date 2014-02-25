@@ -52,14 +52,14 @@
 		style="position: relative; top: 0px; left: 610px; width: 200px; height: 313px; border: solid; padding: 10px;">
 		<fieldset>
 			<legend id="observation-title"> </legend>
-			<button id="btnAddSpot" class="btn btn-warning" 
-				type="button" style="width: 100%;" onclick="javascript:enableAddSpot();"></button>
-			<button id="btnAddCluster" class="btn btn-primary" 
-				type="button" style="width: 100%; margin-top: 10px"
-				onclick="javascript:enableAddCluster();"></button>
-			<button id="removeSpotOrCluster" class="btn" disabled type="button"
+			<button id="btnAddSpot" class="btn btn-warning" type="button"
+				style="width: 100%;" onclick="javascript:enableAddSpot();"></button>
+			<button id="btnAddCluster" class="btn btn-primary" type="button"
 				style="width: 100%; margin-top: 10px"
-				onclick="javascript:removeSelectedMark();"></button>
+				onclick="javascript:enableAddCluster();"></button>
+			<button id="removeSpotOrCluster" class="btn" type="button"
+				style="width: 100%; margin-top: 10px"
+				onclick="javascript:enableRemoveMark();"></button>
 			<label id="addInfoTxtBox" style="margin-top: 15px;"></label>
 			<textarea id="txtObservation"
 				style="width: 90%; height: 90px; resize: none;" rows="3"></textarea>
@@ -144,7 +144,6 @@
 	</div>
 </div>
 
-
 <!-- Info Dialog -->
 <div id="infoDialog" style="display: none;"></div>
 
@@ -181,7 +180,7 @@
 		$("#congratulations").text($.i18n._('congratulations'));
 		$("#completed-task").text($.i18n._('completed-task'));
 		$("#take-another-task").text($.i18n._('take-another-task'));
-		
+
 		$("#experiment-info").attr("title", $.i18n._('experiment-info'));
 		$("#twitter-share").attr("title", $.i18n._('twitter-share'));
 		$("#facebook-share").attr("title", $.i18n._('facebook-share'));
@@ -189,7 +188,7 @@
 	});
 
 	setupKinect();
-	
+
 	var app_shortname = "Sun4All";
 	pybossa.setEndpoint("/pybossa");
 	pybossa.newTask(app_shortname).done(function(data) {
@@ -198,17 +197,13 @@
 
 	function loadTutorial() {
 		$("#infoDialog").empty();
-		$("#infoDialog")
-				.load(
-						"/sun4all/templates/tutorial.html",
-						function() {
-							$("#infoDialog").show();
-							$("#startContrib-label")
-									.html($.i18n._('continueContrib-label'));
-							$("#startContrib").click(function(e) {
-								e.preventDefault();
-								$("#modal").modal('hide');
-							});
-						})
+		$("#infoDialog").load("/sun4all/templates/tutorial.html", function() {
+			$("#infoDialog").show();
+			$("#startContrib-label").html($.i18n._('continueContrib-label'));
+			$("#startContrib").click(function(e) {
+				e.preventDefault();
+				$("#modal").modal('hide');
+			});
+		})
 	}
 </script>

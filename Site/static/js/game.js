@@ -1,5 +1,4 @@
-﻿var markSelected = null;
-var spotCount = 0;
+﻿var spotCount = 0;
 var clusterCount = 0;
 
 var spots = new Array();
@@ -19,6 +18,8 @@ var normalImage, invImage;
 var clusterArea = null;
 var DEFAULT_CROSS_WIDTH = 6;
 
+var removeCursor = "url('/sun4all/images/removeCursor.png') 10 8, auto";
+
 /* MISC Functions */
 function ChangeImage(img, url) {
 	img.src = url;
@@ -28,25 +29,31 @@ function openShareWindow(url) {
 	window.open(url, "_blank", "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, copyhistory=yes, width=500, height=300");
 }
 
-document.onkeydown = function (evt) { 
-	if (typeof evt.keyCode != "undefined" && evt.keyCode == 46) {
-		removeSelectedMark();
-	}
-};
-
 $('body').on('mousedown', function(evt) {
 	if (evt.target.tagName == "BODY") {
 		document.body.style.cursor = 'default';	
 		$("#btnAddSpot").removeAttr("disabled");
 		$("#btnAddCluster").removeAttr("disabled");
-		$("#removeSpotOrCluster").prop("disabled", 'true');	
+		$("#removeSpotOrCluster").removeAttr("disabled");	
+	}
+});
+
+$('body').on('mouseup', function(evt) {
+	if (evt.target.tagName != "CANVAS" && clusterArea != null) {
+		clusterArea.remove();
+		clusterArea = null;
+		layer.draw();
 	}
 });
 
 /*** Main Functions ***/
 
 function handleMouseOverShape() {
-	document.body.style.cursor = 'move';
+	if ($("#removeSpotOrCluster").is(":disabled")) {
+		document.body.style.cursor = removeCursor;
+	} else {
+		document.body.style.cursor = 'move';	
+	}
 }
 
 function handleMouseOutShape() {
@@ -58,8 +65,11 @@ function handleMouseOutShape() {
 	}
 }
 
-function handleMouseClickShape() {
-	setSelectedMark(findMark(this));
+function handleMouseDownShape() {
+	if ($("#removeSpotOrCluster").is(":disabled")) {
+		this.setDraggable(false);
+		removeSelectedMark(findMark(this));	
+	}
 }
 
 function CrossShape(posX, posY, color, width) {
@@ -98,7 +108,7 @@ function CrossShape(posX, posY, color, width) {
 
 	this.shape.on('mouseover', handleMouseOverShape);
 	this.shape.on('mouseout', handleMouseOutShape);
-	this.shape.on("click", handleMouseClickShape);
+	this.shape.on("mousedown", handleMouseDownShape);
 }
 
 CrossShape.prototype.getShape = function(){
@@ -122,38 +132,45 @@ function createCluster(posX, posY) {
 	var origY = posY / scale;
 
 	clusterArea = new Kinetic.Rect({
-					x: origX,
-					y: origY,
-					width: 0,
-					height: 0,
-					stroke: 'blue',
-					strokeWidth: 1,
-					draggable: true,
-				    drawHitFunc: function (context) {
-			              context.beginPath();
-			              context.rect(0, 0, this.getWidth(), this.getHeight());
-			              context.closePath();
-			              context.setAttr('lineWidth', 10);
-			              context.setAttr('strokeStyle', this.colorKey);
-			              context.stroke();
-				    }
-				});
-	
+		x: origX,
+		y: origY,
+		width: 0,
+		height: 0,
+		stroke: 'blue',
+		strokeWidth: 1,
+		draggable: true,
+		drawHitFunc: function (context) {
+			context.beginPath();
+			context.rect(0, 0, this.getWidth(), this.getHeight());
+			context.closePath();
+			context.setAttr('lineWidth', 10);
+			context.setAttr('strokeStyle', this.colorKey);
+			context.stroke();
+		}
+	});
+
 	clusterArea.on("mouseover", handleMouseOverShape);
 	clusterArea.on("mouseout", handleMouseOutShape);
-	clusterArea.on("click", handleMouseClickShape);
+	clusterArea.on("mousedown", handleMouseDownShape);
 
 	layer.add(clusterArea);
 	layer.draw();
 }
 
 function addCluster() {
-	if (clusterArea == null || clusterArea.getWidth() < 1) return; 
-	
+	if (clusterArea == null) return;;
+
+
+	if (Math.abs(clusterArea.getWidth()) < 1) {
+		clusterArea.remove();
+		layer.draw();
+		clusterArea = null;
+		return; 
+	}
+
 	clusters[clusterCount] = clusterArea;
 	clusterCount++;
 	$('#lblclusterCount').text(clusterCount);
-	setSelectedMark(clusterArea);
 	clusterArea = null;
 }
 
@@ -166,7 +183,6 @@ function createSpot(posX, posY) {
 	spotCount++;
 	$('#lblspotCount').text(spotCount);
 
-	setSelectedMark(cross);
 	layer.add(cross.getShape());
 	layer.draw();
 }
@@ -205,7 +221,6 @@ function setupKinect() {
 	stage.add(layer);
 
 	stage.getContainer().addEventListener('mousedown', function(evt) {
-
 		var target = evt.targetNode;
 
 		if ($("#btnAddSpot").is(":enabled") && $("#btnAddCluster").is(":enabled") || 
@@ -222,17 +237,17 @@ function setupKinect() {
 		}
 		evt.cancelBubble = true;
 	});
-	
+
 	stage.getContainer().addEventListener('mouseup', function(evt) {
 		if ($("#btnAddCluster").is(":enabled")) return;
-		
+
 		addCluster();
 	});
 
 	stage.getContainer().addEventListener('mousemove', function(evt) {
-		
+
 		if ($("#btnAddCluster").is(":enabled")) return;
-		
+
 		if (clusterArea != null) {
 			var pos = stage.getMousePosition();
 			pos.x -= stage.attrs.x;
@@ -245,7 +260,7 @@ function setupKinect() {
 			evt.cancelBubble = true;
 		}
 	});
-	
+
 	// Keep the picture inside the div
 	stage.on("dragmove", keepInViewPort);
 	// Zoom events
@@ -415,50 +430,51 @@ function findMark(shape) {
 			return marks[i];
 		}
 	}
+	return null;
 }
 
-function setSelectedMark(mark) {
-	markSelected = mark;
-	$("#removeSpotOrCluster").removeAttr("disabled");
-}
-
-function clearSelectedMark() {
-	markSelected = null;
+function enableRemoveMark() {
+	document.body.style.cursor = 'default';
 	$("#removeSpotOrCluster").prop("disabled", 'true');
+	$("#btnAddCluster").removeAttr("disabled");
+	$("#btnAddSpot").removeAttr("disabled");
 }
 
-function removeSelectedMark() {
-	if (markSelected == null) return; 
+function removeSelectedMark(mark) {
+	if (mark == null) return; 
 
-	var entryType = markSelected.getClassName() == 'Cross' ? 'spot' : 'cluster';
+	var entryType = mark.getClassName() == 'Cross' ? 'spot' : 'cluster';
 
 	if (entryType == 'spot') {
-		spots.splice(spots.indexOf(markSelected), 1);
+		spots.splice(spots.indexOf(mark), 1);
 		spotCount--;
 		$('#lblspotCount').text(spotCount);
-		markSelected.getShape().remove();
-		
+		mark.getShape().remove();
+
 	} else {
-		clusters.splice(clusters.indexOf(markSelected), 1);
+		clusters.splice(clusters.indexOf(mark), 1);
 		clusterCount--;
 		$('#lblclusterCount').text(clusterCount);
-		markSelected.remove();
+		mark.remove();
 	}
 
 	layer.draw();
-	clearSelectedMark();
 }
 
 function enableAddSpot() {
 	document.body.style.cursor = "crosshair";
+
 	$("#btnAddSpot").prop("disabled", 'true');
 	$("#btnAddCluster").removeAttr("disabled");
+	$("#removeSpotOrCluster").removeAttr("disabled");
 }
 
 function enableAddCluster() {
 	document.body.style.cursor = "crosshair";
+
 	$("#btnAddCluster").prop("disabled", 'true');
 	$("#btnAddSpot").removeAttr("disabled");
+	$("#removeSpotOrCluster").removeAttr("disabled");
 }
 
 function startOver() {
@@ -476,7 +492,6 @@ function startOver() {
 	$('#lblclusterCount').text(clusterCount);
 	$('#lblspotCount').text(spotCount);
 
-	clearSelectedMark();
 	reset();
 	layer.draw();
 

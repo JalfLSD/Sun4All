@@ -412,13 +412,13 @@ function loadImages() {
 		sun.setImage(normalImage);
 		stage.draw();
 	};
-	normalImage.src = "http://societic.ibercivis.es/sun4all/sunimages/" + currentImage;
+	normalImage.src = "https://pybossa.socientize.eu/sun4all/sunimages/" + currentImage;
 
 	invImage = new Image();
 	invImage.onload = function() {
 		$("#btnInvert").removeAttr("disabled");
 	};
-	invImage.src = "http://societic.ibercivis.es/sun4all/sunimages/inv/" + currentImage;
+	invImage.src = "https://pybossa.socientize.eu/sun4all/sunimages/inv/" + currentImage;
 }
 
 function findMark(shape) {
